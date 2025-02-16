@@ -1,4 +1,5 @@
 # Task 3
+
 score = int(input("Single grade:"))
 grade = "F"
 

@@ -1,4 +1,5 @@
 #Task 4
+
 def calculate_average (listOfNums):
     scoreSum = 0
     scoreCount = 0

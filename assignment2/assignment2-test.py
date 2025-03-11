@@ -13,6 +13,7 @@ def test_column_name():
     assert a2.employee_id_column != None
 
 def test_first_name():
+    print ("Employees in test: ", a2.employees)
     assert a2.first_name(2) == "Lauren"
 
 def test_employee_find():
@@ -39,3 +40,10 @@ def test_all_employees_dict():
     dict_result = a2.all_employees_dict()
     assert len(dict_result.keys()) == 20
     assert dict_result["9"]["first_name"] == "Phillip"
+
+def test_module():
+    a2.set_that_secret ("foo")
+    assert a2.custom_module.secret == "foo"
+
+def test_env():
+    assert a2.get_this_value() == "ABC"

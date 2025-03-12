@@ -1,14 +1,16 @@
 import csv
 import os
 import custom_module
+from datetime import datetime
 
-# Remove the last character of the last word in arrIn
-# Handy for \ns
+# Remove the last character of the last word in arrIn if it is a new line
 # Pass by reference - modifying the original array
 def removeLastCharOfLastWord (arrIn):
     lastField = arrIn[len(arrIn) - 1]
-    lastField = lastField[0:len(lastField) -1]
-    arrIn[len(arrIn) - 1] = lastField
+    lastChar = lastField[len(lastField)-1]
+    if (lastChar == "\n"):
+        lastField = lastField[0:len(lastField) -1]
+        arrIn[len(arrIn) - 1] = lastField
 
 # read_employees
 # Open csvFile, assume first line is fields followed by a line for each employee
@@ -33,8 +35,7 @@ def read_employees ():
                 # Remove newlinne
                 removeLastCharOfLastWord(rowFields)
                 listOfRows.append (rowFields)
-                # employees.update ({'rows':rowFields})
-                employees['rows'] = rowFields
+
         employees['rows'] = listOfRows   
         return employees
     except Exception as e:
@@ -107,32 +108,141 @@ def all_employees_dict ():
         rowNbr += 1
     return retDict
 
-# Returnv value of the environment variable THISVALUE
+# Return value of the environment variable THISVALUE
 def get_this_value():
     return os.environ['THISVALUE']
 
 def set_that_secret (secretIn):
     custom_module.set_secret(secretIn)
 
+# Read in two minutes files into two dictionaries
+# Return those dictionaries
+# Each Dictionary will have the first entry as "fields", the second entry as "rows"
+# The rows will be tuples
+def read_minutes():
+    # MINUTES_1 = " ..\\csv\\minutes1.csv"
+    MINUTES_1 = "C:\\Users\\rick-\\Documents\\CTD\\python\\python_homework\\csv\\minutes1.csv"
+    # MINUTES_2 =  "../csv/minutes2.csv"
+    MINUTES_2 = "C:\\Users\\rick-\\Documents\\CTD\\python\\python_homework\\csv\\minutes2.csv"
+
+    minutes1Dict = getMinutes(MINUTES_1)
+    minutes2Dict = getMinutes(MINUTES_2)
+
+    return minutes1Dict, minutes2Dict
+
+
+def getMinutes(fileIn):
+    retDict = {}
+    listOfRows = []
+    firstRow = False
+
+    # Open the file for reading
+    f = open(fileIn, "r")
+    irstRow = False
+    for row in f:
+        if (not firstRow):
+            # rowFields = row.split (",")
+            rowFields = csv.reader(row.splitlines())
+            # print ("Row fields after CSV Reader:")
+            for row in rowFields:
+                # print(row)
+                removeLastCharOfLastWord(row)
+                # Should only be one row
+                rowFields = row
+
+            # Add to dictionary with field name of "fields"
+            retDict['fields'] = rowFields
+            firstRow = True
+        else:
+            rowFields = csv.reader(row.splitlines())
+            # print ("Row fields after CSV Reader:")
+            for row in rowFields:
+                # print(row)
+                removeLastCharOfLastWord(row)
+                # Should only be one row
+                rowFields = row
+
+            rowTuple = tuple (rowFields)
+            listOfRows.append (rowTuple)
+            # employees['rows'] = rowFields
+    retDict['rows'] = listOfRows   
+    return retDict
+
+# References global variables minutes1 and minutes2
+# Convert the two lists into sets. Return the union of the two sets
+def create_minutes_set():
+    setMinutes1 = set (minutes1["rows"])
+    setMinutes2 = set (minutes2["rows"])
+    finalSet = setMinutes1.union(setMinutes2)
+    return finalSet
+
+# References global minutes_set
+# Convert minutes_set to a list
+# Convert the string that is a date into a string. Put the name of recorder and date object into a tuple
+# return the tuple
+def create_minutes_list():
+    listMinutes = list (minutes_set)
+    newList = []
+    #for item in listMinutes:
+    #    newDate = datetime.strptime(item[1], "%B %d, %Y")
+    #    print ("New date: ", newDate)
+    #    newList.append ([item[0], newDate])
+    return tuple(map (lambda x: (x[0], datetime.strptime(x[1], "%B %d, %Y")),listMinutes))
+
+# References globals minustes_set and minutes1
+# Convert date object in minuts_set to a string. Sort based on date. 
+# Write the fields as first line in minutes.csv followed by each line in sorted list
+# Return the sorted list
+def write_sorted_list():
+    OUTFILENAME = ".\\minutes.csv"
+    retList = []
+
+    # print ("Minutes list: ", minutes_list)
+    sortedList = sorted(minutes_list, key=lambda x: x[1])
+
+    with open(OUTFILENAME, 'w', newline='') as csvfile:
+        headerNames = minutes1["fields"]
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow (headerNames)
+        retList = list (map (lambda x: (x[0], datetime.strftime(x[1], "%B %d, %Y")),sortedList)) 
+        csvwriter.writerows(retList)
+        print ("Sorted minutes written to:", OUTFILENAME)
+
+    return retList
+
 FILEPATH = "C:\\Users\\rick-\\Documents\\CTD\\python\\python_homework\\csv\\employees.csv"
 employees = {}
 employees = read_employees ()
-print ("Employees:", employees)
+# print ("Employees:", employees)
 
 employee_id_column = column_index("first_name")
-print ("First name from second row: ", first_name(2))
+# print ("First name from second row: ", first_name(2))
 
 # print (employee_find (12))
 # print (employee_find_2 (12))
-rowsSorted = sort_by_last_name ()
+# rowsSorted = sort_by_last_name ()
 # print ("After sort:", employees)
-rowDict = employee_dict (employees["rows"][0])
-print ("Single dictionary: ", rowDict)
-dict_result = all_employees_dict()
-print ("New employee dict:",dict_result)
+# rowDict = employee_dict (employees["rows"][0])
+# print ("Single dictionary: ", rowDict)
+# dict_result = all_employees_dict()
+# print ("New employee dict:",dict_result)
 
 # print (get_this_value())
-set_that_secret ("foo")
-print (custom_module.secret)
+# set_that_secret ("foo")
+# print (custom_module.secret)
 
-print (get_this_value())
+# print (get_this_value())
+
+minutes1, minutes2 = read_minutes()
+
+#print ("Minutes 1:", minutes1, "\n")
+#print ("Minutes 2:", minutes2, "\n")
+
+minutes_set = create_minutes_set()
+#print ("Set of minutes: ", minutes_set)
+
+minutes_list = create_minutes_list()
+#print ("Minute list: ", minutes_list)
+
+sortedList = write_sorted_list()
+# print ("Sorted List: ", sortedList)

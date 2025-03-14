@@ -1,3 +1,5 @@
+# Author: Rick Martin
+
 import csv
 import os
 import custom_module
@@ -15,7 +17,8 @@ def removeLastCharOfLastWord (arrIn):
 # read_employees
 # Open csvFile, assume first line is fields followed by a line for each employee
 # Store the employee information in a dictionary and return the dictionary
-def read_employees ():
+# References global FILEPATH
+def read_employees_old ():
     csvFile = FILEPATH
     listOfRows = []
     try:
@@ -41,6 +44,24 @@ def read_employees ():
     except Exception as e:
         # Handle the exception
         print(f"An error occurred: {e}")
+
+def read_employees():
+    print ("Reading in employees with csv.reader!")
+    listOfRows = []
+    firstRow = False
+    with open(FILEPATH, 'r') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            if (not firstRow):
+                # Add to dictionary with field name of "fields"
+                employees['fields'] = row
+                firstRow = True
+            else:
+                listOfRows.append(row)
+        employees['rows'] = listOfRows 
+    return employees
+
+
 
 # Assume first row of dictIn has field names in a list with name of "fields"
 # Return the index in that list of fieldName
@@ -213,7 +234,7 @@ def write_sorted_list():
 FILEPATH = "C:\\Users\\rick-\\Documents\\CTD\\python\\python_homework\\csv\\employees.csv"
 employees = {}
 employees = read_employees ()
-# print ("Employees:", employees)
+print ("Employees:", employees)
 
 employee_id_column = column_index("first_name")
 # print ("First name from second row: ", first_name(2))

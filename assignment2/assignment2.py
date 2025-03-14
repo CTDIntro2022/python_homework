@@ -5,61 +5,29 @@ import os
 import custom_module
 from datetime import datetime
 
-# Remove the last character of the last word in arrIn if it is a new line
-# Pass by reference - modifying the original array
-def removeLastCharOfLastWord (arrIn):
-    lastField = arrIn[len(arrIn) - 1]
-    lastChar = lastField[len(lastField)-1]
-    if (lastChar == "\n"):
-        lastField = lastField[0:len(lastField) -1]
-        arrIn[len(arrIn) - 1] = lastField
-
 # read_employees
 # Open csvFile, assume first line is fields followed by a line for each employee
 # Store the employee information in a dictionary and return the dictionary
 # References global FILEPATH
-def read_employees_old ():
-    csvFile = FILEPATH
-    listOfRows = []
-    try:
-        f = open(csvFile, "r")
-        firstRow = False
-        for row in f:
-            if (not firstRow):
-                rowFields = row.split (",")
-                # Remove newlinne
-                removeLastCharOfLastWord(rowFields)
-
-                # Add to dictionary with field name of "fields"
-                employees['fields'] = rowFields
-                firstRow = True
-            else:
-                rowFields = row.split (",")
-                # Remove newlinne
-                removeLastCharOfLastWord(rowFields)
-                listOfRows.append (rowFields)
-
-        employees['rows'] = listOfRows   
-        return employees
-    except Exception as e:
-        # Handle the exception
-        print(f"An error occurred: {e}")
-
 def read_employees():
     print ("Reading in employees with csv.reader!")
     listOfRows = []
     firstRow = False
-    with open(FILEPATH, 'r') as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-            if (not firstRow):
-                # Add to dictionary with field name of "fields"
-                employees['fields'] = row
-                firstRow = True
-            else:
-                listOfRows.append(row)
-        employees['rows'] = listOfRows 
-    return employees
+    try: 
+        with open(FILEPATH, 'r') as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                if (not firstRow):
+                    # Add to dictionary with field name of "fields"
+                    employees['fields'] = row
+                    firstRow = True
+                else:
+                    listOfRows.append(row)
+            employees['rows'] = listOfRows 
+        return employees
+    except Exception as e:
+        # Handle the exception
+        print(f"An error occurred: {e}")
 
 
 
@@ -158,34 +126,15 @@ def getMinutes(fileIn):
     firstRow = False
 
     # Open the file for reading
-    f = open(fileIn, "r")
-    irstRow = False
-    for row in f:
-        if (not firstRow):
-            # rowFields = row.split (",")
-            rowFields = csv.reader(row.splitlines())
-            # print ("Row fields after CSV Reader:")
-            for row in rowFields:
-                # print(row)
-                removeLastCharOfLastWord(row)
-                # Should only be one row
-                rowFields = row
-
-            # Add to dictionary with field name of "fields"
-            retDict['fields'] = rowFields
-            firstRow = True
-        else:
-            rowFields = csv.reader(row.splitlines())
-            # print ("Row fields after CSV Reader:")
-            for row in rowFields:
-                # print(row)
-                removeLastCharOfLastWord(row)
-                # Should only be one row
-                rowFields = row
-
-            rowTuple = tuple (rowFields)
-            listOfRows.append (rowTuple)
-            # employees['rows'] = rowFields
+    with open(fileIn, 'r') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            if (not firstRow):
+                retDict['fields'] = row
+                firstRow = True
+            else:
+                rowTuple = tuple (row)
+                listOfRows.append (rowTuple)
     retDict['rows'] = listOfRows   
     return retDict
 

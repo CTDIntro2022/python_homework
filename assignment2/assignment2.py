@@ -4,13 +4,13 @@ import csv
 import os
 import custom_module
 from datetime import datetime
+import pandas
 
 # read_employees
 # Open csvFile, assume first line is fields followed by a line for each employee
 # Store the employee information in a dictionary and return the dictionary
 # References global FILEPATH
 def read_employees():
-    print ("Reading in employees with csv.reader!")
     listOfRows = []
     firstRow = False
     try: 
@@ -183,7 +183,7 @@ def write_sorted_list():
 FILEPATH = "C:\\Users\\rick-\\Documents\\CTD\\python\\python_homework\\csv\\employees.csv"
 employees = {}
 employees = read_employees ()
-print ("Employees:", employees)
+# print ("Employees:", employees)
 
 employee_id_column = column_index("first_name")
 # print ("First name from second row: ", first_name(2))

@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import os
 
-
-test1_df = pd.DataFrame({   'Name': ['Alice', 'Bob', 'charlie'], 
+test1_df = pd.DataFrame({   'Name': ['Alice', 'Bob', 'Charlie'], 
                             'Age': [25, 30, 35], 
                             'City': ['New York', 'Los Angeles', 'Chicago']})
 
@@ -104,3 +103,30 @@ def test_department_uppercase():
         if not dept.isupper():
             all_upper = False
     assert all_upper
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

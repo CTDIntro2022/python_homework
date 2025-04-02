@@ -6,7 +6,7 @@ import numpy as np
 #  Name: ['Alice', 'Bob', 'Charlie']
 #  Age: [25, 30, 35]
 #  City: ['New York', 'Los Angeles', 'Chicago']
-dict = { "Name": ['Alice', 'Bob', 'charlie'],
+dict = { "Name": ['Alice', 'Bob', 'Charlie'],
         "Age": [25, 30, 35],
         "City": ['New York', 'Los Angeles', 'Chicago'] }
 task1_data_frame = pd.DataFrame(dict)

@@ -10,14 +10,11 @@ with sqlite3.connect("../db/lesson.db") as conn:
     df = pd.read_sql_query(sql_statement, conn)
     # print(df)
 
-# The SQL statement should retrieve the line_item_id, quantity, product_id, product_name, 
-# and price from a JOIN of the line_items table and the product table. 
-# Hint: Your ON statement would be ON line_items.product_id = products.product_id.
+
 with sqlite3.connect("../db/lesson.db") as conn:
-    #sql_statement = "SELECT line_items.line_item_id,line_Items.quantity, line_items.product_id, products.product_name \
-    #   FROM line_items JOIN products ON line_items.product_id = products.product_id"
-    #sql_statement = "Select l.line_item_id, l.quantity, l.product_id, p.product_name FROM line_items as l JOIN products as p \
-    #    ON l.product_id = p.product_id"
+    # The SQL statement should retrieve the line_item_id, quantity, product_id, product_name, 
+    # and price from a JOIN of the line_items table and the product table. 
+    # Hint: Your ON statement would be ON line_items.product_id = products.product_id.
     sql_statement = "Select l.line_item_id, l.quantity, l.product_id, p.product_name, p.price FROM line_items l JOIN products p \
            ON l.product_id = p.product_id"
     df = pd.read_sql_query(sql_statement, conn)
@@ -30,15 +27,19 @@ with sqlite3.connect("../db/lesson.db") as conn:
 
     # Add groupby() code to group by the product_id. Use an agg() method that specifies 'count' for the line_item_id column, 'sum' for the total column, 
     # and 'first' for the 'product_name'. Print out the first 5 lines of the resulting DataFrame. Run the program to see if it is correct so far.
-    # dfAgg = df.groupby ('product_id').agg({'product_name':['first'],'line_item_id':['count'], 'total':['sum']})
     dfAgg = df.groupby ('product_id').agg({'product_name':'first','line_item_id':'count', 'total':'sum'})
     print ("Aggregated:")
     print (dfAgg.head(10))
-    column_names = df.columns.tolist()
-    print ("Column names: ", column_names)
 
     # Sort the DataFrame by the product_name column.
     # dfAgg.sort_values(by=['product_name'])
     dfAgg.sort_values(by='product_name',ascending=True,inplace=True)
+    print ("Sorted by product name:" )
     print (dfAgg.head(10))
+
+    # write this DataFrame to a file order_summary.csv
+    outFile = "order_summary.csv"
+    dfAgg.to_csv (outFile)
+    print ("Sorted and aggregated data frame written to: ", outFile)
+
 

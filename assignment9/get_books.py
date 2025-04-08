@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 import pandas as pd
 import csv
 import re
+from time import sleep
+import json
 
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
@@ -17,22 +19,24 @@ results  = []
 pageCount = 1
 dupeEntry = False
 
-# Will keep moving throuh pages by incrementin page cont.  IF you browswe to site with page count > what is availabhle then
-# the last page will be shown. We will know that by checking to see if the first item found on that page has alread been inserted
-# in the results list. dupeEntry will be set to true which will exit the while loop.
-# Alernatively could have found number of results at cp-pagination-label. Pulled out total, divide by 19 and that is number of pages
+# Find number of results at cp-pagination-label. Pulled out total, divide by 20, add 1 and that is number of pages
+driver.get (baseURL)
+body = driver.find_element(By.CSS_SELECTOR,'body') # Find the first body element, typically only one
 
-# This is alternate code
-# body = driver.find_element(By.CSS_SELECTOR,'body') # Find the first body element, typically only one                                            
-# pageText = body.find_element(By.CLASS_NAME, "cp-screen-reader-shortcuts")
-# print (pageText)
+# Get pagination label
+pageLabel = body.find_element(By.CLASS_NAME, "cp-pagination-label")
 
-while (not dupeEntry):
+# Format is 1 to 20 of 256 results
+resultPages = re.findall(r'\b\d+\b', pageLabel.text)
+result = resultPages[2]
+nbrOfPages = int(int(result)/20) + 1
+
+while (pageCount <= nbrOfPages):
     # driver.get ("https://durhamcounty.bibliocommons.com/v2/search?query=learning%20spanish&searchType=smart")
     url = baseURL + str(pageCount)
     driver.get (url)
 
-    print ("URL: ", driver.current_url)
+    sleep(2) # wait 2 seconds
     body = driver.find_element(By.CSS_SELECTOR,'body') # Find the first body element, typically only one
 
     # List Items with classs 
@@ -59,9 +63,10 @@ while (not dupeEntry):
             else:
                 authors = author.text
 
-        bookDict = {"Format-Year" : formatYear, "Author" : authors, "Title" : titleText }
+        bookDict = {"Format-Year" : formatYear, "Author" : authors, "Title" : titleText, "Page" : pageCount }
+        # Every once in a while get a dupe in the search results
         if bookDict in results:
-            print ("Dupe entry: ", bookDict)
+            print ("Dupe entry: ", bookDict, pageCount)
             dupeEntry = True
             break
         else:    
@@ -72,9 +77,12 @@ driver.quit()
     
 # Put results into a data frame
 df = pd.DataFrame(results)
-df.sort_values ("Title")
 print (df)
 
 csvFile = "get_books.csv"
 df.to_csv (csvFile)
 print ("DF written to ", csvFile)
+
+jsonFile = "get_books.json"
+df.to_json (jsonFile, indent=4, orient='records')
+print ("DF written to:", jsonFile)

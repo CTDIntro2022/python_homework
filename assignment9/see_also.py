@@ -22,10 +22,10 @@ body = driver.find_element(By.CSS_SELECTOR,'body') # Find the first body element
 # Get pagination label
 # rootClass = "cp-pagination-label"
 rootClass = "div-col"
-rootID = "See_also"
-# element = body.find_element(By.CLASS_NAME, rootClass)
-element = body.find_element(By.ID, rootID)
-# print ("Element text:", element.text)
+# rootID = "See_also"
+element = body.find_element(By.CLASS_NAME, rootClass)
+# element = body.find_element(By.ID, rootID)
+print ("Element text:", element.text)
 
 
 # Get the HTML source of the WebElement
